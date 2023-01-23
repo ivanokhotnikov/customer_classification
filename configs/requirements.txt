@@ -1,0 +1,7 @@
+pre-commit==2.21.0
+python-dotenv==0.21.1
+google-cloud-pipeline-components==1.0.33
+scikit-learn==1.2.0
+xgboost==1.7.3
+pandas==1.5.3
+pytest==7.2.1
