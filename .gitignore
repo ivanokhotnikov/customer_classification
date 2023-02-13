@@ -1,8 +1,12 @@
+.gitignore
 .env
-.venv
+.venv*
 data/
 compiled
 logs/
 env*
 __pycache__
 *_cache
+artifacts/
+registry/
+results/

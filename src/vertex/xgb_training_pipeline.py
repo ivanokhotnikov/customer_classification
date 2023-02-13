@@ -126,7 +126,7 @@ if __name__ == '__main__':
         aip.init(project=os.environ['PROJECT_ID'],
                  location=os.environ['LOCATION'],
                  experiment=args.exp_name,
-                 staging_bucket=os.environ['PIPELINES_PATH'])
+                 staging_bucket=os.environ['GCS_PIPELINES_PATH'])
         aip.start_run(run=timestamp)
         training_parameters = {
             'seed': args.seed,
@@ -151,7 +151,7 @@ if __name__ == '__main__':
         train_job = aip.PipelineJob(
             project=os.environ['PROJECT_ID'],
             location=os.environ['LOCATION'],
-            pipeline_root=os.environ['PIPELINES_PATH'],
+            pipeline_root=os.environ['GCS_PIPELINES_PATH'],
             enable_caching=args.enable_caching,
             display_name=timestamp,
             template_path='./compiled/training_pipeline.json',
@@ -161,8 +161,8 @@ if __name__ == '__main__':
                 'timestamp': timestamp,
                 'exp_name': args.exp_name,
                 'deploy_image': os.environ['DEPLOY_IMAGE'],
-                'data_path': os.environ['DATA_PATH'],
-                'models_path': os.environ['MODELS_PATH'],
+                'data_path': os.environ['GCS_DATA_PATH'],
+                'models_path': os.environ['GCS_MODELS_PATH'],
                 **training_parameters,
                 **hyperparameters
             })

@@ -61,7 +61,7 @@ def clean_vertex(
         sys.exit()
     aip.init(
         project=env['project_id'],
-        location=env["region"],
+        location=env['region'],
     )
     try:
         if clean_custom_jobs:
