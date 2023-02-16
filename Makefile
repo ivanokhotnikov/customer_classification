@@ -19,7 +19,7 @@ grid-tuning-run-vertex:
 random-tuning-run-vertex:
 	python ./src/vertex/xgb_random_search_tuning.py
 
-unit-tests:
+unit-tests-vertex:
 	python -m pytest ./src/vertex/tests/
 
 clean-vertex:

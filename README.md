@@ -74,14 +74,34 @@ Only compile pipeline
 make compile
 
 ```
-Default training run
+Default local training run
 ```
-make default-run
+make default-run params="[OPTIONS]"
+
+OPTIONS:
+  --exp-name EXP_NAME
+  --seed SEED
+  --threshold THRESHOLD
+  --num-cat-cols NUM_CAT_COLS
+  --val-to-train-split VAL_TO_TRAIN_SPLIT
+  --test-to-all-split TEST_TO_ALL_SPLIT
+  --boost-rounds BOOST_ROUNDS
+  --folds FOLDS
+  --eta ETA
+  --max-depth MAX_DEPTH
+  --n_estimators N_ESTIMATORS
+  --min-child-weight MIN_CHILD_WEIGHT
+  --subsample SUBSAMPLE
+  --objective OBJECTIVE
+  --eval-metric EVAL_METRIC
+  --grow-policy GROW_POLICY
+  --reg-lambda REG_LAMBDA
+  --reg-alpha REG_ALPHA
 ```
 
-Custom training run
+Custom cloud training run
 ```
-make custom-run params="[OPTIONS]"
+make custom-run-vertex params="[OPTIONS]"
     --compile_only
     --enable_caching
     --seed SEED
@@ -103,19 +123,19 @@ make custom-run params="[OPTIONS]"
 
 Unit tests
 ```
-make unit-tests
+make unit-tests-vertex
 ```
 
 Perform grid search hyper parameters tuning
 ```
-make grid-tuning-run
+make grid-tuning-run-vertex
 ```
 
 Perform random search hyper parameters tuning
 ```
-make random-tuning-run
+make random-tuning-run-vertex
 ```
 
-## Training workflow
+## Cloud training workflow
 
 ![](images/dag.png)
