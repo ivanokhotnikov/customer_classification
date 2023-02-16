@@ -1,39 +1,29 @@
-timestamp := $(shell date +%Y%m%d%H%M%S)
-export
-
 pre-commit:
 	pre-commit run --all-files
 
 default-run:
-	mkdir -p ./logs/$@
-	python ./src/local/xgb_training_pipeline.py ${params} --timestamp=$(timestamp) &>> ./logs/$@/$(timestamp).log
+	python ./src/local/xgb_training_pipeline.py ${params}
 
 compile-vertex:
-	mkdir -p ./logs/$@
-	python ./src/vertex/xgb_training_pipeline.py --compile_only &>>./logs/$@/$(timestamp).log
+	python ./src/vertex/xgb_training_pipeline.py --compile_only
 
 default-run-vertex:
-	mkdir -p ./logs/$@
-	python ./src/vertex/xgb_training_pipeline.py --enable_caching &>>./logs/$@/$(timestamp).log
+	python ./src/vertex/xgb_training_pipeline.py --enable_caching
 
 custom-run-vertex:
-	mkdir -p ./logs/$@
-	python ./src/vertex/xgb_training_pipeline.py ${params} --enable_caching &>>./logs/$@/$(timestamp).log
+	python ./src/vertex/xgb_training_pipeline.py ${params} --enable_caching
 
 grid-tuning-run-vertex:
-	mkdir -p ./logs/$@
-	python ./src/vertex/xgb_grid_search_tuning.py &>>./logs/$@/$(timestamp).log
+	python ./src/vertex/xgb_grid_search_tuning.py
 
 random-tuning-run-vertex:
-	mkdir -p ./logs/$@
-	python ./src/vertex/xgb_random_search_tuning.py &>>./logs/$@/$(timestamp).log
+	python ./src/vertex/xgb_random_search_tuning.py
 
 unit-tests:
-	mkdir -p ./logs/$@
-	python -m pytest ./src/vertex/tests/ &>>./logs/$@/$(timestamp).log
+	python -m pytest ./src/vertex/tests/
 
 clean-vertex:
-	python ./src/vertex/clean_vertex.py -all -v` &>>./logs/$@/$(timestamp).log
+	python ./src/vertex/clean_vertex.py -all -v
 
 venv-dev:
 	python -m venv .venv &&\

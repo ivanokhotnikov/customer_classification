@@ -1,18 +1,32 @@
-import numpy as np
+import logging
+
 from sklearn.model_selection import train_test_split
 
 
-def split(args, df):
-    train_df, test_df = df[df['created_account'].notnull()], df[
-        df['created_account'].isnull()]
-    train_df['created_account'] = np.where(
-        train_df.loc[:, 'created_account'] == 'Yes', 1, 0)
-    test_df['created_account'] = np.where(
-        test_df.loc[:, 'created_account'] == 'Yes', 1, 0)
-    train_df, validation_df = train_test_split(
-        train_df,
-        test_size=args.val_to_train_split,
-        random_state=args.seed,
-        stratify=train_df['created_account'])
-    print('Processed data was split!')
-    return train_df, test_df, validation_df
+def split(args, df, features):
+    """
+    The split function takes in a dataframe and splits it into train and test sets.
+    The split is stratified by the 'created_account' column to ensure that the same proportion of
+    users are in each set as is represented in the original dataset. The function also accepts a list
+    of features for use in split.
+
+    Args:
+        args: Pass arguments to the function
+        df: Split the dataframe into train and test
+        features: Specify the columns that are used for training
+
+    Returns:
+        Train and test dataframes
+    """
+    nonull_df = df.loc[df['created_account'].notnull(),
+                       features + ['created_account']]
+    _, test_df = train_test_split(nonull_df,
+                                  shuffle=True,
+                                  random_state=args.seed,
+                                  test_size=args.test_to_all_split,
+                                  stratify=nonull_df['created_account'])
+    train_df = df.loc[:, features + ['created_account']].drop(test_df.index)
+    logging.info('Processed data split!')
+    logging.info('\tpreprocessed train shape: {}'.format(train_df.shape))
+    logging.info('\ttest shape: {}\n'.format(test_df.shape))
+    return train_df, test_df

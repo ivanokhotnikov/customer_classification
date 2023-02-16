@@ -1,32 +1,49 @@
-import pandas as pd
-import numpy as np
+import logging
 import os
+
+import pandas as pd
 
 
 def preprocess(df):
+    """
+    The preprocess function takes a dataframe as input and returns a new dataframe with the following changes:
+        1. The salary_band column is split into three columns: yearly_salary, monthly_salary, weekly_salary
+        2. The currency column is converted to GBP using exchange rates from the file exchange_rates.csv
 
-    def get_salaries(x: str):
-        salary_gbp = x.split()[0][1:]
-        if 'yearly' in x:
-            return pd.Series([salary_gbp, np.nan, np.nan, '£'])
-        elif 'month' in x:
-            return pd.Series([np.nan, salary_gbp, np.nan, '£'])
-        elif 'pw' in x:
-            return pd.Series([np.nan, np.nan, salary_gbp, '£'])
-        elif 'range' in x:
-            top_salary_gbp = x.split()[2]
-            return pd.Series([
-                str(np.mean((int(salary_gbp), int(top_salary_gbp)))), np.nan,
-                np.nan, '£'
-            ])
-        salary_non_gbp = x.split()[0][:-3]
-        currency = x.split()[0][-3:]
-        return pd.Series([salary_non_gbp, np.nan, np.nan, currency])
+    Args:
+        df: Pass the dataframe to be preprocessed
 
-    df[['yearly_salary', 'monthly_salary', 'weekly_salary',
-        'currency']] = df.apply(lambda x: get_salaries(x['salary_band']),
-                                axis=1,
-                                result_type='expand')
+    Returns:
+        Interim dataframe
+    """
+    df['yearly_salary'] = df.loc[df['salary_band'].str.contains('yearly'),
+                                 'salary_band'].str.removeprefix(
+                                     '£').str.removesuffix(' yearly').astype(
+                                         float)
+    df['monthly_salary'] = df.loc[df['salary_band'].str.contains('per month'),
+                                  'salary_band'].str.removeprefix(
+                                      '£').str.removesuffix(
+                                          ' per month').astype(float)
+    df['weekly_salary'] = df.loc[df['salary_band'].str.contains('pw'),
+                                 'salary_band'].str.removeprefix(
+                                     '£').str.removesuffix(' pw').astype(float)
+    df['range_start'] = df.loc[
+        df['salary_band'].str.contains('range'),
+        'salary_band'].str.removeprefix('£').str.removesuffix(
+            ' range').str.replace(' - ',
+                                  ' ').str.split().str.get(0).astype(float)
+    df['range_end'] = df.loc[df['salary_band'].str.contains('range'),
+                             'salary_band'].str.removeprefix(
+                                 '£').str.removesuffix(' range').str.replace(
+                                     ' - ',
+                                     ' ').str.split().str.get(1).astype(float)
+    df.loc[df['salary_band'].str.contains('range'),
+           'yearly_salary'] = df.loc[df['salary_band'].str.contains('range'),
+                                     ['range_start', 'range_end']].mean(axis=1)
+    df['currency'] = df.loc[df['salary_band'].str.contains('£'),
+                            'salary_band'].str.get(0)
+    df.loc[df['salary_band'].str.contains('GBP'), 'currency'] = '£'
+
     currency_map = {
         'ANG': 0.4,
         'TJS': 0.063,
@@ -73,15 +90,11 @@ def preprocess(df):
     df[['yearly_salary', 'monthly_salary', 'weekly_salary'
         ]] = df[['yearly_salary', 'monthly_salary',
                  'weekly_salary']].apply(pd.to_numeric, errors='coerce')
-    df['yearly_salary'] = np.where(
-        df['yearly_salary'].notnull(),
-        df['yearly_salary'],
-        np.where(
-            df['monthly_salary'].notnull(),
-            df['monthly_salary'] * 12,
-            df['weekly_salary'] * 52,
-        ),
-    )
+    df.loc[(df['yearly_salary'].isna()) & (df['monthly_salary'].notnull()),
+           'yearly_salary'] = df['monthly_salary'] * 12
+    df.loc[(df['yearly_salary'].isna()) & (df['monthly_salary'].isna()) &
+           (df['weekly_salary'].notnull()),
+           'yearly_salary'] = df['weekly_salary'] * 52
     df = df[df['yearly_salary'].notnull()]
-    print('Data was preprocessed!')
+    logging.info('Data preprocessed!\n')
     return df
