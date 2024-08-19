@@ -1,6 +1,6 @@
 # Customer classification
 
-The repository contains the source code of the cloud training workflow to develop the xgboost customer binary classifier. The purpose of the classifier is to target customers in a marketing campaign.
+The repository contains the source code of the cloud training workflow to develop the binary customer classifier with xgboost. The purpose of the classifier is to target customers in a marketing campaign.
 
 ## Data scheme
 
